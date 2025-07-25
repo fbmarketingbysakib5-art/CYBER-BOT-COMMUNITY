@@ -138,7 +138,7 @@ module.exports.handleEvent = async function ({ api, event, Users }) {
  const senderName = await Users.getNameUser(event.senderID);
 
  if (
- raw === "baby" || raw === "bot" || raw === "bby" ||
+ raw === "baby" || raw === "sakibb" || raw === "bby" ||
  raw === "jan" || raw === "xan" || raw === "জান" || raw === "বট" || raw === "বেবি"
  ) {
  const greetings = [

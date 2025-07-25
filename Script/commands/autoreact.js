@@ -1,62 +1,62 @@
+const fs = require("fs-extra");
+
+const REACT_CONFIG_PATH = __dirname + "/autoreact-config.json";
+
+// Load or initialize config
+let reactConfig = {};
+if (fs.existsSync(REACT_CONFIG_PATH)) {
+  reactConfig = fs.readJsonSync(REACT_CONFIG_PATH);
+}
+
 module.exports.config = {
   name: "autoreact",
-  version: "1.1.1",
-  hasPermission: 0,
-  credits: "𝐂𝐘𝐁𝐄𝐑 ☢️_𖣘 -𝐁𝐎𝐓 ⚠️ 𝑻𝑬𝑨𝑴_ ☢️",
-  description: "Bot React",
-  commandCategory: "No Prefix",
-  usages: '[]',
-  cooldowns: 0,
+  version: "2.0.0",
+  hasPermission: 2, // Only admins can toggle
+  credits: "CYBER TEAM & Enhanced by ChatGPT",
+  description: "Auto reacts to certain keywords. Admins can turn it on/off per group.",
+  commandCategory: "group",
+  usages: "autoreact [on/off]",
+  cooldowns: 3,
 };
-const fs = require("fs");
-module.exports.handleEvent = function({ api, event, client, __GLOBAL }) {
-  var { threadID, messageID } = event;
-  let react = event.body.toLowerCase();
-  if(react.includes("Soul") || react.includes("soul")) {
-    var msg = {
-        body: ""
-      }
-      api.sendMessage(msg, threadID, messageID);
-    api.setMessageReaction("🖤", event.messageID, (err) => {}, true)
-          };
 
-    if(react.includes("mahal") || react.includes("Krishna") || react.includes("flag") ||  react.includes("Flag") || react.includes("krishna") || react.includes("Mahakal") || react.includes("mahakal") || react.includes("Mahadev") || react.includes("mahadev") || react.includes("Ram") || react.includes("ram") || react.includes("Love") || react.includes("love") || react.includes("lab") || react.includes("lab") || react.includes("😊") || react.includes("ilove") || react.includes("Ilove") || react.includes("iLove") || react.includes("ilab") || react.includes("iLab") || react.includes("Ilab") || react.includes("labyu") || react.includes("Labyu") || react.includes("kiss") || react.includes("Kiss") || react.includes("yie") || react.includes("Krass") || react.includes("krass") || react.includes("kras") || react.includes("Krass") || react.includes("crush") || react.includes("crush") || react.includes("ligawan") || react.includes("kilig") || react.includes("fuck") || react.includes("Fuck") || react.includes("Kinikilig") || react.includes("Kilig") || react.includes("😗") || react.includes("😙") || react.includes("😘") || react.includes("😚") || react.includes("ugh") || react.includes("Ugh") || react.includes("sige pa") || react.includes("Sige pa") || react.includes("ullash") || react.includes("@Ullash ッ") || react.includes("sex") || react.includes("Sex") || react.includes("☺") || react.includes("porn") || react.includes("Porn") || react.includes("kantotan") || react.includes("Kantotan") || react.includes("Iyotan") || react.includes("Iyutan") || react.includes("iyotan") || react.includes("iyutan") || react.includes("pasend") || react.includes("Pasend") || react.includes("Iyut") || react.includes("Iyot") || react.includes("iyot") || react.includes("iyut") || react.includes("eut") || react.includes("Eut") || react.includes("eut") || react.includes("😍") || react.includes("shet") || react.includes("Shet") || react.includes("send") || react.includes("Send") || react.includes("baby") || react.includes("Baby") || react.includes("babe") || react.includes("Babe") || react.includes("babi") || react.includes("Baby") || react.includes("bby") || react.includes("Bby") || react.includes("kantot") || react.includes("Kantot") || react.includes("manyak") || react.includes("libog") || react.includes("Libog") || react.includes("horn") || react.includes("Horn") || react.includes("abno") || react.includes("Abno") || react.includes("malibog") || react.includes("labs") || react.includes("Labs") || react.includes("pekpek") || react.includes("Pekpek") || react.includes("@তোগো চাচ্চু মার্ক জাকারবার্গ") || react.includes("Pepe") || react.includes("🤭") || react.includes("🥰") || react.includes("puke") || react.includes("Puke") || react.includes("bilat") || react.includes("Bilat") || react.includes("puday") || react.includes("Puday") || react.includes("finger") || react.includes("Finger") || react.includes("fifinger") || react.includes("pipinger") || react.includes("Pipinger") || react.includes("pinger") || react.includes("Pinger") || react.includes("mwah") || react.includes("Mwah") || react.includes("mwuah") || react.includes("Mwuah") || react.includes("angel") || react.includes("Angel") || react.includes("jordan") || react.includes("Marry") || react.includes("😇") || react.includes("🤡")) {
-      var lab = {
-        body: ""
-      }
-      api.sendMessage(lab, threadID, messageID);
-    api.setMessageReaction("❤️", event.messageID, (err) => {}, true)
-          };
-    if(react.includes("sakit") || react.includes("Sakit") || react.includes("saket") || react.includes("Saket") || react.includes("peyn") || react.includes("Peyn") || react.includes("Pain") || react.includes("mamatay") || react.includes("Mamatay") || react.includes("ayaw ko na") || react.includes("Ayaw ko na") || react.includes("saktan") || react.includes("Saktan") || react.includes("Sasaktan") || react.includes("sasaktan") || react.includes("sad") || react.includes("Sad") || react.includes("malungkot") || react.includes("Malungkot") || react.includes(" 😥") || react.includes("😰") || react.includes("😨") || react.includes("😢") || react.includes(":(") || react.includes("😔") || react.includes("😞") || react.includes("depress") || react.includes("stress") || react.includes("Stress") || react.includes("Depress") || react.includes("depression") || react.includes("Depression") || react.includes("kalungkutan") || react.includes("Kalungkutan") || react.includes("😭")) {
-      var sad = {
-        body: ""
-      }
-      api.sendMessage(sad, threadID, messageID);
-    api.setMessageReaction("😢", event.messageID, (err) => {}, true)
-          };
-  if(react.includes("India") || react.includes("india") || react.includes("bharat") || react.includes("Bharat")) {
-      var flag = {
-        body: ""
-      }
-      api.sendMessage(flag, threadID, messageID);
-    api.setMessageReaction("🇧🇩", event.messageID, (err) => {}, true)
-          };
-  if(react.includes("eve") || react.includes("Eve") || react.includes("morning") || react.includes("Morning") || react.includes("afternoon") || react.includes("Afternoon") || react.includes("evening") || react.includes("eat") || react.includes("Eat") || react.includes("night") || react.includes("nyt") || react.includes("Night") || react.includes("Nyt")) {
-      var heart = {
-        body: ""
-      }
-      api.sendMessage(heart, threadID, messageID);
-    api.setMessageReaction("❤", event.messageID, (err) => {}, true)
-            };
-  if(react.includes("wow") || react.includes("robot")) {
-      var heart = {
-        body: ""
-      }
-      api.sendMessage(heart, threadID, messageID);
-    api.setMessageReaction("😮", event.messageID, (err) => {}, true)
-            }
-        }
-  module.exports.run = function({ api, event, client, __GLOBAL }) {
+module.exports.handleEvent = function ({ api, event }) {
+  const { threadID, messageID, body } = event;
+  if (!reactConfig[threadID]) return; // If not enabled in this thread, do nothing
 
+  let react = body?.toLowerCase();
+  if (!react) return;
+
+  if (react.includes("love") || react.includes("kiss") || react.includes("baby")) {
+    api.setMessageReaction("❤️", messageID, () => {}, true);
+  } else if (react.includes("sad") || react.includes("pain") || react.includes(":(")) {
+    api.setMessageReaction("😢", messageID, () => {}, true);
+  } else if (react.includes("wow") || react.includes("robot")) {
+    api.setMessageReaction("😮", messageID, () => {}, true);
   }
+};
+
+module.exports.run = async function ({ api, event, args }) {
+  const { threadID, messageID } = event;
+  const permission = global.config.ADMINBOT || [];
+
+  if (!permission.includes(event.senderID)) {
+    return api.sendMessage("Only bot admins can use this command.", threadID, messageID);
+  }
+
+  const action = args[0]?.toLowerCase();
+  if (!action || !["on", "off"].includes(action)) {
+    return api.sendMessage("Usage: autoreact on/off", threadID, messageID);
+  }
+
+  if (action === "on") {
+    reactConfig[threadID] = true;
+    fs.writeJsonSync(REACT_CONFIG_PATH, reactConfig);
+    return api.sendMessage("✅ Auto reaction enabled in this group.", threadID, messageID);
+  } else if (action === "off") {
+    delete reactConfig[threadID];
+    fs.writeJsonSync(REACT_CONFIG_PATH, reactConfig);
+    return api.sendMessage("❌ Auto reaction disabled in this group.", threadID, messageID);
+  }
+};
+
 

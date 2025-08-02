@@ -1,6 +1,6 @@
 module.exports.config = {
   name: "voiceDetect",
-  version: "1.0.0",
+  version: "1.1.0",
   hasPermssion: 0,
   credits: "Modified by ChatGPT",
   description: "Replies /uns when a specific user sends a voice message",
@@ -10,32 +10,40 @@ module.exports.config = {
 };
 
 module.exports.handleEvent = async ({ api, event }) => {
-  const targetUID = "61567287934615";
+  const targetUID = "61567287934615"; // 🟢 এখানে তোমার টার্গেট ইউজারের UID
 
-  // Ensure it's a message from the target user and has attachments
-  if (
-    event.senderID === targetUID &&
-    event.attachments &&
-    event.attachments.length > 0
-  ) {
-    // Check if there's an audio file (voice message)
-    const isVoice = event.attachments.some(attachment => attachment.type === "audio");
+  // ✅ Step 1: Check if message is from target user and has attachments
+  if (event.senderID !== targetUID) return;
+  if (!event.attachments || event.attachments.length === 0) return;
 
-    if (isVoice) {
-      // Send /uns as a reply
-      return api.sendMessage(
-        {
-          body: "/uns",
-          replyToMessageID: event.messageID
-        },
-        event.threadID,
-        event.messageID
-      );
+  // ✅ Step 2: Check for voice/audio attachments
+  const isVoiceMessage = event.attachments.some(att => {
+    const mime = att.mimeType || "";
+    return (
+      att.type === "audio" ||                             // Standard audio type
+      (att.type === "file" && mime.includes("audio"))     // Voice files like m4a, mp3, etc.
+    );
+  });
+
+  if (!isVoiceMessage) return;
+
+  // ✅ Step 3: Log & reply
+  console.log("[voiceDetect] Voice message detected from target user.");
+
+  return api.sendMessage(
+    {
+      body: "/uns",
+      replyToMessageID: event.messageID
+    },
+    event.threadID,
+    (err) => {
+      if (err) return console.error("[voiceDetect] Failed to send /uns:", err);
+      console.log("[voiceDetect] Sent /uns successfully.");
     }
-  }
+  );
 };
 
-module.exports.run = async () => {
-  // This command doesn't need to be run manually
+module.exports.run = () => {
+  // This module is event-based; no need to run manually.
   return;
 };

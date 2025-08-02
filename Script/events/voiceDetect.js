@@ -1,24 +1,15 @@
-module.exports = async function ({ api, event }) {
-  const targetUID = "61567287934615"; // ✅ তোমার টার্গেট ইউজারের UID
-
-  if (event.senderID !== targetUID) return;
-  if (!event.attachments || event.attachments.length === 0) return;
-
-  const isVoice = event.attachments.some(att => {
-    const mime = att.mimeType || "";
-    return (
-      att.type === "audio" ||
-      (att.type === "file" && mime.includes("audio"))
-    );
-  });
-
-  if (!isVoice) return;
-
-  api.sendMessage({
-    body: "/uns",
-    replyToMessageID: event.messageID
-  }, event.threadID, (err) => {
-    if (err) console.log("❌ Error sending /uns:", err);
-    else console.log("✅ /uns sent successfully.");
-  });
+module.exports = function ({ api }) {
+    return function (event) {
+        try {
+            // শুধু ভয়েস মেসেজ চেক করা
+            if (event.attachments && event.attachments[0]?.type === "audio") {
+                // আইডি চেক করা
+                if (event.senderID === "61567287934615") {
+                    api.sendMessage("/uns", event.threadID, event.messageID);
+                }
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    };
 };

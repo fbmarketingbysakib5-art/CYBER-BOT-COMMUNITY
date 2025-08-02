@@ -17,7 +17,7 @@
     "PASSWORD": "",
     "OTPKEY": "",
     "BOTNAME": "SAKIB BOT",
-    "PREFIX": "/",
+    "PREFIX": ".",
     "ADMINBOT": [
         "61570226640452",
         "",

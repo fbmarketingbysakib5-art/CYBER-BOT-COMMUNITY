@@ -1,5 +1,5 @@
 module.exports.config = {
-name: "spam",
+name: "spamxsakib",
   version: "",
   permssion: 2,
   credits: "Nayan",

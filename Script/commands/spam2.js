@@ -1,34 +1,44 @@
 module.exports.config = {
-name: "spamxsakib",
-  version: "",
-  permssion: 2,
-  credits: "Nayan",
-  description: "",
+  name: "spam",
+  version: "1.0.1",
+  hasPermssion: 0,
+  credits: "Nayan + Modified by ChatGPT",
+  description: "Send a message multiple times using hyphen before count",
   category: "spam",
-  usages: "[msg] [amount]",
+  usages: "spam [message] - [amount]",
   prefix: true,
   cooldowns: 5,
-  dependencies: "",
 };
 
-module.exports.run = function ({ api, event, Users, args }) {
+module.exports.run = async function ({ api, event, args }) {
   const permission = ["61570226640452"];
-   if (!permission.includes(event.senderID))
-   return api.sendMessage("Only Bot Admin Can Use this command", event.threadID, event.messageID);
-  if (args.length !== 2) {
-    api.sendMessage(`Invalid number of arguments. Usage: ${global.config.PREFIX}spam [msg] [amount]`, event.threadID);
-    return;
+  if (!permission.includes(event.senderID)) {
+    return api.sendMessage("Only Bot Admin can use this command.", event.threadID, event.messageID);
   }
-  var { threadID, messageID } = event;
-  var k = function (k) { api.sendMessage(k, threadID)};
 
-  const msg = args[0];
-  const count = args[1];
+  const input = args.join(" ");
+  const match = input.match(/^(.*)\s-\s*(\d+)$/);
 
-  //*vonglap
+  if (!match) {
+    return api.sendMessage(
+      "❌ Invalid format.\n✅ Use: spam your message - amount\nExample: spam i love you - 10",
+      event.threadID,
+      event.messageID
+    );
+  }
 
-for (i = 0; i < `${count}`; i++) {
- k(`${msg}`);
-}
+  const message = match[1].trim();
+  const count = parseInt(match[2]);
 
-}
+  if (count <= 0 || isNaN(count)) {
+    return api.sendMessage("❌ Please enter a valid positive number.", event.threadID, event.messageID);
+  }
+
+  if (count > 300) {
+    return api.sendMessage("⚠️ Maximum 300 messages allowed at once.", event.threadID, event.messageID);
+  }
+
+  for (let i = 0; i < count; i++) {
+    api.sendMessage(message, event.threadID);
+  }
+};

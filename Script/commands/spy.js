@@ -1,103 +1,84 @@
-const axios = require("axios");
-
 module.exports = {
   config: {
     name: "spy",
-    version: "1.0",
+    version: "2.0",
     hasPermission: 0,
-    usePrefix: true,
-    credits: "Modified by ChatGPT",
-    description: "Get user information",
-    commandCategory: "information",
-    cooldowns: 5,
+    credits: "ChatGPT",
+    description: "View user info by UID, tag, or reply",
+    commandCategory: "info",
+    cooldowns: 5
   },
 
-  run: async function ({ api, event, args, Users }) {
+  run: async function({ api, event, args, Users }) {
     try {
       let uid;
 
-      // Check if UID, profile link, mention, or reply
+      // 1. Get UID from args, mentions, or reply
       if (args[0]) {
-        if (/^\d+$/.test(args[0])) {
-          uid = args[0];
-        } else {
-          const match = args[0].match(/profile\.php\?id=(\d+)/);
-          if (match) uid = match[1];
-        }
+        const urlMatch = args[0].match(/profile\.php\?id=(\d+)/);
+        uid = urlMatch ? urlMatch[1] : args[0];
+      }
+
+      if (!uid && Object.keys(event.mentions).length > 0) {
+        uid = Object.keys(event.mentions)[0];
+      }
+
+      if (!uid && event.messageReply) {
+        uid = event.messageReply.senderID;
       }
 
       if (!uid) {
-        if (event.type === "message_reply") {
-          uid = event.messageReply.senderID;
-        } else if (Object.keys(event.mentions).length > 0) {
-          uid = Object.keys(event.mentions)[0];
-        } else {
-          uid = event.senderID;
-        }
+        uid = event.senderID;
       }
 
-      const userInfo = await api.getUserInfo(uid);
-      const info = userInfo[uid];
+      // 2. Fetch user info from Facebook
+      const info = await api.getUserInfo(uid);
+      const user = info[uid];
 
-      if (!info) return api.sendMessage("ℹ️ User info পাওয়া যায়নি।", event.threadID);
+      if (!user) throw new Error("User not found");
 
-      // Gender
-      let genderText = "Unknown";
-      switch (info.gender) {
-        case 1: genderText = "Girl 🙋‍♀️"; break;
-        case 2: genderText = "Boy 🙋‍♂️"; break;
-      }
-
-      // Birthday
-      const birthdayText = info.isBirthday ? "Yes 🎂" : "No ❌";
-
-      // Friend status
-      const friendText = info.isFriend ? "Yes ✅" : "No ❎";
-
-      // User data (money, etc.)
+      // 3. User stats from bot database
       const userData = await Users.get(uid);
-      const money = userData?.money || 0;
-      const allUser = await Users.getAll();
+      const allUsers = await Users.getAll();
 
-      const rank = allUser
-        .sort((a, b) => b.exp - a.exp)
-        .findIndex(user => user.userID === uid) + 1;
+      const money = userData.money || 0;
+      const exp = userData.exp || 0;
 
-      const moneyRank = allUser
-        .sort((a, b) => b.money - a.money)
-        .findIndex(user => user.userID === uid) + 1;
+      const rank = allUsers.sort((a, b) => b.exp - a.exp)
+        .findIndex(u => u.userID == uid) + 1;
 
-      const result = `
-╭─[ 👁️ USER INFO ]
-├🧑 Name: ${info.name}
-├🔢 UID: ${uid}
-├📛 Nickname: ${info.alternateName || "None"}
-├🧬 Gender: ${genderText}
-├🎉 Birthday: ${birthdayText}
-├🤝 Friend with bot: ${friendText}
-├🌐 Profile: ${info.profileUrl || "Private"}
+      const moneyRank = allUsers.sort((a, b) => b.money - a.money)
+        .findIndex(u => u.userID == uid) + 1;
 
-╰─[ 📊 USER STATS ]
-├💰 Money: ${formatMoney(money)}
-├🏅 EXP Rank: #${rank}/${allUser.length}
-╰📈 Money Rank: #${moneyRank}/${allUser.length}
-`;
+      // 4. Gender check
+      let gender = "Unknown";
+      if (user.gender == 1) gender = "Girl 🙋‍♀️";
+      else if (user.gender == 2) gender = "Boy 🙋‍♂️";
 
-      return api.sendMessage(result, event.threadID, event.messageID);
+      // 5. Build and send message
+      const message = `
+👤 𝗨𝗦𝗘𝗥 𝗜𝗡𝗙𝗢
+━━━━━━━━━━━━━━
+📛 Name: ${user.name}
+🆔 UID: ${uid}
+🔗 Profile: ${user.profileUrl || "Unavailable"}
+💬 Username: ${user.vanity || "N/A"}
+🚻 Gender: ${gender}
+🎂 Birthday: ${user.isBirthday || "Private"}
+🤝 Friend with bot: ${user.isFriend ? "Yes ✅" : "No ❌"}
+
+📊 𝗨𝗦𝗘𝗥 𝗦𝗧𝗔𝗧𝗦
+💰 Balance: $${money}
+📈 Exp: ${exp}
+🏆 EXP Rank: #${rank}/${allUsers.length}
+💵 Money Rank: #${moneyRank}/${allUsers.length}
+      `;
+
+      return api.sendMessage(message.trim(), event.threadID, event.messageID);
+
     } catch (err) {
-      console.error("❌ spy command error:", err);
-      return api.sendMessage("❌ Error fetching user info.", event.threadID, event.messageID);
+      console.error("Spy error:", err);
+      return api.sendMessage("❌ Error: User info আনতে সমস্যা হয়েছে। হয়ত প্রোফাইল লকড/বন্ধ বা বট ফ্রেন্ড না।", event.threadID, event.messageID);
     }
   }
 };
-
-function formatMoney(num) {
-  if (typeof num !== 'number') return num;
-  const units = ["", "K", "M", "B", "T"];
-  let unit = 0;
-  while (num >= 1000 && unit < units.length - 1) {
-    num /= 1000;
-    unit++;
-  }
-  return `${num.toFixed(1)}${units[unit]}`;
-}

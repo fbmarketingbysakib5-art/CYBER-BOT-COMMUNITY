@@ -1,5 +1,5 @@
 module.exports.config = {
-  name: "spam",
+  name: "stt",
   version: "1.0.1",
   hasPermssion: 0,
   credits: "Nayan + Modified by ChatGPT",

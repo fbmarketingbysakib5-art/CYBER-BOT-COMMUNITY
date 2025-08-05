@@ -12,7 +12,7 @@ module.exports.config = {
 
 module.exports.run = async function ({ api, event }) {
  const userId = event.senderID;
- const supportGroupThreadId = "6601227983317461";// Replace with the actual thread ID of the support group, if available.
+ const supportGroupThreadId = "27713730958242948";// Replace with the actual thread ID of the support group, if available.
 
  try {
  const threadInfo = await api.getThreadInfo(supportGroupThreadId);

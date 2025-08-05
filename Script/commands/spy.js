@@ -1,10 +1,4 @@
 const axios = require("axios");
-const baseApiUrl = async () => {
-  const base = await axios.get(
-    `https://raw.githubusercontent.com/Blankid018/D1PT0/main/baseApiUrl.json`,
-  );
-  return base.data.api;
-};
 
 module.exports = {
   config: {
@@ -12,97 +6,98 @@ module.exports = {
     version: "1.0",
     hasPermission: 0,
     usePrefix: true,
-    credits: "Dipto",
-    description: "Get user information and profile photo",
+    credits: "Modified by ChatGPT",
+    description: "Get user information",
     commandCategory: "information",
-    cooldowns: 10,
+    cooldowns: 5,
   },
 
-  run: async function ({
-    event,
-    Users,
-    api,
-    args,
-  }) {
-    const uid1 = event.senderID;
+  run: async function ({ api, event, args, Users }) {
+    try {
+      let uid;
 
-    const uid2 = Object.keys(event.mentions)[0];
-    let uid;
-
-    if (args[0]) {
-      if (/^\d+$/.test(args[0])) {
-        uid = args[0];
-      } else {
-        const match = args[0].match(/profile\.php\?id=(\d+)/);
-        if (match) {
-          uid = match[1];
+      // Check if UID, profile link, mention, or reply
+      if (args[0]) {
+        if (/^\d+$/.test(args[0])) {
+          uid = args[0];
+        } else {
+          const match = args[0].match(/profile\.php\?id=(\d+)/);
+          if (match) uid = match[1];
         }
       }
+
+      if (!uid) {
+        if (event.type === "message_reply") {
+          uid = event.messageReply.senderID;
+        } else if (Object.keys(event.mentions).length > 0) {
+          uid = Object.keys(event.mentions)[0];
+        } else {
+          uid = event.senderID;
+        }
+      }
+
+      const userInfo = await api.getUserInfo(uid);
+      const info = userInfo[uid];
+
+      if (!info) return api.sendMessage("ℹ️ User info পাওয়া যায়নি।", event.threadID);
+
+      // Gender
+      let genderText = "Unknown";
+      switch (info.gender) {
+        case 1: genderText = "Girl 🙋‍♀️"; break;
+        case 2: genderText = "Boy 🙋‍♂️"; break;
+      }
+
+      // Birthday
+      const birthdayText = info.isBirthday ? "Yes 🎂" : "No ❌";
+
+      // Friend status
+      const friendText = info.isFriend ? "Yes ✅" : "No ❎";
+
+      // User data (money, etc.)
+      const userData = await Users.get(uid);
+      const money = userData?.money || 0;
+      const allUser = await Users.getAll();
+
+      const rank = allUser
+        .sort((a, b) => b.exp - a.exp)
+        .findIndex(user => user.userID === uid) + 1;
+
+      const moneyRank = allUser
+        .sort((a, b) => b.money - a.money)
+        .findIndex(user => user.userID === uid) + 1;
+
+      const result = `
+╭─[ 👁️ USER INFO ]
+├🧑 Name: ${info.name}
+├🔢 UID: ${uid}
+├📛 Nickname: ${info.alternateName || "None"}
+├🧬 Gender: ${genderText}
+├🎉 Birthday: ${birthdayText}
+├🤝 Friend with bot: ${friendText}
+├🌐 Profile: ${info.profileUrl || "Private"}
+
+╰─[ 📊 USER STATS ]
+├💰 Money: ${formatMoney(money)}
+├🏅 EXP Rank: #${rank}/${allUser.length}
+╰📈 Money Rank: #${moneyRank}/${allUser.length}
+`;
+
+      return api.sendMessage(result, event.threadID, event.messageID);
+    } catch (err) {
+      console.error("❌ spy command error:", err);
+      return api.sendMessage("❌ Error fetching user info.", event.threadID, event.messageID);
     }
-
-    if (!uid) {
-      uid =
-        event.type === "message_reply"
-          ? event.messageReply.senderID
-          : uid2 || uid1;
-    }
-
-    const response = await axios.get(
-      `${await baseApiUrl()}/baby?list=all`
-    );
-    const dataa = response.data || { teacher: { teacherList: [] } };
-    let babyTeach = 0;
-
-    if (dataa?.teacher?.teacherList?.length) {
-      babyTeach = dataa.teacher.teacherList.find((t) => t[uid])?.[uid] || 0;
-    }
-
-    const userInfo = await api.getUserInfo(uid);
-
-    let genderText;
-    switch (userInfo[uid].gender) {
-      case 1:
-        genderText = "𝙶𝚒𝚛𝚕🙋🏻‍♀️";
-        break;
-      case 2:
-        genderText = "Boy🙋🏻‍♂️";
-        break;
-      default:
-        genderText = "𝙶𝚊𝚢🤷🏻‍♂️";
-    }
-
-    const money = (await Users.get(uid)).money;
-    const allUser = await Users.getAll();
-    const rank = allUser.slice().sort((a, b) => b.exp - a.exp).findIndex(user => user.userID === uid) + 1;
-    const moneyRank = allUser.slice().sort((a, b) => b.money - a.money).findIndex(user => user.userID === uid) + 1;
-
-    const position = userInfo[uid].type;
-
-    const userInformation = `
-╭─[ 𝐔𝐒𝐄𝐑 𝐈𝐍𝐅𝐎 ]
-├‣ 𝙽𝚊𝚖𝚎: ${userInfo[uid].name}
-├‣ 𝙽𝚒𝚌𝚔𝙽𝚊𝚖𝚎: ${userInfo[uid].alternateName || "𝙽𝚘𝚗𝚎"}
-├‣ 𝚄𝙸𝙳: ${uid}
-├‣ 𝙲𝚕𝚊𝚜𝚜: ${position ? position?.toUpperCase() : "𝙽𝚘𝚛𝚖𝚊𝚕 𝚄𝚜𝚎𝚛🥺"}
-├‣ 𝚄𝚜𝚎𝚛𝚗𝚊𝚖𝚎: ${userInfo[uid].vanity ? userInfo[uid].vanity : "𝙽𝚘𝚗𝚎"}
-├‣ 𝙶𝚎𝚗𝚍𝚎𝚛: ${genderText}
-├‣ 𝙱𝚒𝚛𝚝𝚑𝚍𝚊𝚢: ${userInfo[uid].isBirthday !== false ? userInfo[uid].isBirthday : "𝙿𝚛𝚒𝚟𝚊𝚝𝚎"}
-├‣ 𝙵𝚛𝚒𝚎𝚗𝚍 𝚠𝚒𝚝𝚑 𝚋𝚘𝚝: ${userInfo[uid].isFriend ? "𝚈𝚎𝚜✅" : "𝙽𝚘❎"}
-╰‣ 𝙿𝚛𝚘𝚏𝚒𝚕𝚎 𝚄𝚁𝙻: ${userInfo[uid].profileUrl}
-
-╭─[ 𝐔𝐒𝐄𝐑 𝐒𝐓𝐀𝐓𝐒 ]
-├‣ 𝙼𝚘𝚗𝚎𝚢: $${formatMoney(money)}
-├‣ 𝚁𝚊𝚗𝚔: #${rank}/${allUser.length}
-├‣ 𝙼𝚘𝚗𝚎𝚢 𝚁𝚊𝚗𝚔: #${moneyRank}/${allUser.length}
-╰‣ 𝙱𝚊𝚋𝚢 𝚝𝚎𝚊𝚌𝚑: ${babyTeach || 0}`;
-
-    api.sendMessage(userInformation, event.threadID, event.messageID);
-  },
+  }
 };
 
 function formatMoney(num) {
-  const units = ["", "K", "M", "B", "T", "Q", "Qi", "Sx", "Sp", "Oc", "N", "D"];
+  if (typeof num !== 'number') return num;
+  const units = ["", "K", "M", "B", "T"];
   let unit = 0;
-  while (num >= 1000 && ++unit < units.length) num /= 1000;
-  return num.toFixed(1).replace(/\.0$/, "") + units[unit];
+  while (num >= 1000 && unit < units.length - 1) {
+    num /= 1000;
+    unit++;
+  }
+  return `${num.toFixed(1)}${units[unit]}`;
 }

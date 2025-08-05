@@ -46,6 +46,7 @@ module.exports = {
           ? event.messageReply.senderID
           : uid2 || uid1;
     }
+
     const response = await axios.get(
       `${await baseApiUrl()}/baby?list=all`
     );
@@ -57,7 +58,6 @@ module.exports = {
     }
 
     const userInfo = await api.getUserInfo(uid);
-    const avatarUrl = `https://graph.facebook.com/${uid}/picture?height=1500&width=1500&access_token=6628568379%7Cc1e620fa708a1d5696fb991c1bde5662`;
 
     let genderText;
     switch (userInfo[uid].gender) {
@@ -72,7 +72,9 @@ module.exports = {
     }
 
     const money = (await Users.get(uid)).money;
-const allUser = await Users.getAll(), rank = allUser.slice().sort((a, b) => b.exp - a.exp).findIndex(user => user.userID === uid) + 1, moneyRank = allUser.slice().sort((a, b) => b.money - a.money).findIndex(user => user.userID === uid) + 1;
+    const allUser = await Users.getAll();
+    const rank = allUser.slice().sort((a, b) => b.exp - a.exp).findIndex(user => user.userID === uid) + 1;
+    const moneyRank = allUser.slice().sort((a, b) => b.money - a.money).findIndex(user => user.userID === uid) + 1;
 
     const position = userInfo[uid].type;
 
@@ -93,11 +95,8 @@ const allUser = await Users.getAll(), rank = allUser.slice().sort((a, b) => b.ex
 ├‣ 𝚁𝚊𝚗𝚔: #${rank}/${allUser.length}
 ├‣ 𝙼𝚘𝚗𝚎𝚢 𝚁𝚊𝚗𝚔: #${moneyRank}/${allUser.length}
 ╰‣ 𝙱𝚊𝚋𝚢 𝚝𝚎𝚊𝚌𝚑: ${babyTeach || 0}`;
-const avatarStream = (await require("axios").get(avatarUrl, { responseType: "stream" })).data;
-   api.sendMessage({
-      body: userInformation,
-      attachment: avatarStream,
-    }, event.threadID, event.messageID);
+
+    api.sendMessage(userInformation, event.threadID, event.messageID);
   },
 };
 

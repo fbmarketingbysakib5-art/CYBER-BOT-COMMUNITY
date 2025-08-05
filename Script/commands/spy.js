@@ -1,20 +1,20 @@
 module.exports = {
   config: {
     name: "spy",
-    version: "1.2",
+    version: "1.3",
     hasPermssion: 0,
     usePrefix: true,
     credits: "YourName",
-    description: "Get detailed user information",
+    description: "Get basic user information",
     commandCategory: "information",
     cooldowns: 10,
   },
 
   run: async function({ event, api, args, Users }) {
     try {
-      // UID সংগ্রহ
       let uid;
 
+      // Get UID from args, mention, or reply
       if (args[0]) {
         if (/^\d+$/.test(args[0])) {
           uid = args[0];
@@ -25,14 +25,11 @@ module.exports = {
       }
 
       if (!uid) {
-        uid = event.messageReply ? event.messageReply.senderID : (Object.keys(event.mentions)[0] || event.senderID);
+        uid = event.messageReply?.senderID || Object.keys(event.mentions)[0] || event.senderID;
       }
 
-      // ইউজার নাম ও ডেটা
       const userName = await Users.getNameUser(uid);
-      const userData = await Users.getData(uid);
 
-      // Facebook থেকে ইনফো ট্রাই করা
       let fbInfo;
       try {
         fbInfo = await api.getUserInfo(uid);
@@ -41,34 +38,20 @@ module.exports = {
         fbInfo = null;
       }
 
-      // ইউজার ডেটা
-      const money = userData.money || 0;
-      const exp = userData.exp || 0;
-      const level = userData.level || "Not set";
-      const reputation = userData.reputation || 0;
-      const registered = userData.registered || false;
-
-      // Gender mapping (প্রথম কোডের মত করে)
-      let gender = "Unknown";
+      // ✅ Gender Mapping (same as first code)
+      let gender = "Unknown ❓";
       if (fbInfo && typeof fbInfo.gender !== "undefined") {
         if (fbInfo.gender === 1) gender = "Female 👩";
         else if (fbInfo.gender === 2) gender = "Male 👨";
-        else gender = "Unknown";
       }
 
       const name = fbInfo?.name || userName || "Unknown";
 
-      // ফাইনাল মেসেজ
-      let message = `🔍 Detailed User Information\n\n`;
+      // Final Output
+      let message = `🔍 Basic User Information\n\n`;
       message += `👤 Name: ${name}\n`;
       message += `🆔 User ID: ${uid}\n`;
-      message += `🧬 Gender: ${gender}\n\n`;
-
-      message += `💰 Money: $${money}\n`;
-      message += `⭐ EXP: ${exp}\n`;
-      message += `📊 Level: ${level}\n`;
-      message += `👍 Reputation: ${reputation}\n`;
-      message += `✅ Registered: ${registered ? "Yes" : "No"}\n`;
+      message += `🧬 Gender: ${gender}`;
 
       return api.sendMessage(message, event.threadID, event.messageID);
     } catch (error) {

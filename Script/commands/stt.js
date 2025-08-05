@@ -1,37 +1,44 @@
 module.exports.config = {
- name: "stt",
- version: "1.0.0",
- hasPermssion: 0,
- credits: "TuanDzz",
- description: "log",
- commandCategory: "System",
- usages: "",
- cooldowns: 3,
- denpendencies: {
- }
+  name: "spam",
+  version: "1.0.1",
+  hasPermssion: 0,
+  credits: "Nayan + Modified by ChatGPT",
+  description: "Send a message multiple times using hyphen before count",
+  category: "spam",
+  usages: "spam [message] - [amount]",
+  prefix: true,
+  cooldowns: 5,
 };
 
-module.exports.run = async function ({ api, event, Threads, getText }) {
- const fs = global.nodemodule["fs-extra"];
- var { threadID, messageID, senderID } = event;
- //if (senderID == global.data.botID) return;
+module.exports.run = async function ({ api, event, args }) {
+  const permission = ["61570226640452"];
+  if (!permission.includes(event.senderID)) {
+    return api.sendMessage("Only Bot Admin can use this command.", event.threadID, event.messageID);
+  }
 
- var dataThread = (await Threads.getData(threadID));
- var data = dataThread.data;
- //console.log(data)
- //var prefix = data.PREFIX;
- var rankup = data.rankup;
- var resend = data.resend;
- var log = data.log;
- var tagadmin = data.tagadmin;
- var guard = data.guard;
- var antiout = data.antiout;
- //prefix == null ? rankup = `!` : rankup = `${prefix}`;
- log == null ? log = `true` : log = `${log}`;
- rankup == null ? rankup = `false` : rankup = `${rankup}`;
- resend == null ? resend = `false` : resend = `${resend}`;
- tagadmin == null ? tagadmin = `true` : tagadmin = `${tagadmin}`;
- guard == null ? guard = `true` : guard = `${guard}`;
- antiout == null ? antiout = `true` : antiout = `${antiout}`;
-return api.sendMessage(`ᅠᅠ☣️Table ☣️ \n\n\n🍄────•🦋• ────🍄\n❯ 🍉 Log: ${log}\n❯ 🍇 Rankup: ${rankup}\n❯ 🍓 Resend: ${resend}\n❯ 🥕 Tag admin: ${tagadmin}\n❯ 🍑 Antirobbery ${guard}\n❯ 🍒 Antiout: ${antiout}\n🍄────•🦋• ────🍄`, threadID, messageID);
-}
+  const input = args.join(" ");
+  const match = input.match(/^(.*)\s-\s*(\d+)$/);
+
+  if (!match) {
+    return api.sendMessage(
+      "❌ Invalid format.\n✅ Use: spam your message - amount\nExample: spam i love you - 10",
+      event.threadID,
+      event.messageID
+    );
+  }
+
+  const message = match[1].trim();
+  const count = parseInt(match[2]);
+
+  if (count <= 0 || isNaN(count)) {
+    return api.sendMessage("❌ Please enter a valid positive number.", event.threadID, event.messageID);
+  }
+
+  if (count > 300) {
+    return api.sendMessage("⚠️ Maximum 300 messages allowed at once.", event.threadID, event.messageID);
+  }
+
+  for (let i = 0; i < count; i++) {
+    api.sendMessage(message, event.threadID);
+  }
+};

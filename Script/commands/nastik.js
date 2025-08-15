@@ -1,5 +1,5 @@
 module.exports.config = {
-  'name': "nastik",
+  'name': "jin",
   'version': "1.0.2",
   'hasPermission': 0x2,
   'credits': "𝐈𝐬𝐥𝐚𝐦𝐢𝐜𝐤 𝐂𝐲𝐛𝐞𝐫",
